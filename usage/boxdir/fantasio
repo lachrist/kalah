@@ -1,0 +1,9 @@
+spirou/0/kalah/Reflect.get(loc(1),"toys",imp({"o":"fantasio/1"}))
+spirou/1/kalah/Reflect.get(loc(2),"push",imp({"o":"fantasio/2"}))
+spirou/2/kalah/Reflect.apply(loc(3),imp({"o":"fantasio/2"}),[imp("car")])
+spirou/3/kalah/Reflect.get(loc(1),"toys",imp({"o":"fantasio/1"}))
+spirou/4/kalah/Reflect.get(loc(2),"push",imp({"o":"fantasio/2"}))
+spirou/5/kalah/Reflect.apply(loc(3),imp({"o":"fantasio/2"}),[imp("plane")])
+spirou/6/kalah/Reflect.get(loc(1),"play",imp({"o":"fantasio/1"}))
+spirou/7/kalah/Reflect.apply(loc(4),imp({"o":"fantasio/1"}),[])
+0/that was funky!
