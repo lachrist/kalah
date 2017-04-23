@@ -1,20 +1,16 @@
-
-var Melf = require("melf");
+var Melf = require("melf/node");
 var Kalah = require("kalah");
-
 var melf = Melf({
-  boxdir: __dirname+"/boxdir",
-  alias: "fantasio"
+  format: JSON,
+  alias: "fantasio",
+  url: __dirname+"/socket",
+  splitter: "marsupilami"
 });
 var kalah = Kalah(melf);
-
 var marsupilami = {
   toys: [],
   play: function () {
-    console.log("marsupilami is playing with: "+this.toys);
+    console.log("marsu is playing with: "+this.toys);
   }
 };
-
-console.log(melf.sync.trigger("spirou", "marsupilami", JSON.stringify(kalah.export(marsupilami))));
-
-melf.close();
+console.log(melf.sync.emit("spirou", "marsupilami", kalah.export(marsupilami)));

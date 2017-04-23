@@ -4,17 +4,17 @@ var ReflectTypes = require("./reflect-types.js");
 module.exports = function (melf, kahla) {
   var traps = {};
   Object.keys(ReflectTypes.arguments).forEach(function (key) {
-    var event = "kalah-"+key;
+    var name = "kalah-"+key;
     var t1 = ReflectTypes.arguments[key];
     var t2 = ReflectTypes.result[key];
-    melf.sync.register(event, function (origin, data) {
-      var res = Reflect[key].apply(null, kahla.import(JSON.parse(data), t1));
-      return t2 ? JSON.stringify(kahla.export(res, t2)) : "";
+    melf.sync.register(name, function (origin, data, callback) {
+      var res = Reflect[key].apply(null, kahla.import(data, t1));
+      callback(null, t2 ? kahla.export(res, t2) : "");
     });
     traps[key] = function (tgt) {
-      var data = melf.sync.trigger(tgt.alias, event, JSON.stringify(kahla.export(arguments, t1)));
+      var data = melf.sync.emit(tgt.alias, name, kahla.export(arguments, t1));
       if (t2)
-        return kahla.import(JSON.parse(data), t2);
+        return kahla.import(data, t2);
     };
   });
   return function (key, tgt) {

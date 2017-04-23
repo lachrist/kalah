@@ -1,9 +1,6 @@
 function loop (value, type, mappers) {
-  if (typeof type === "string") {
-    if (type in mappers)
-      return mappers[type](value);
-    else
-      throw new Error("Unknown type: "+type+", must be one of: "+Object.keys(mappers))
+  if (typeof type === "string" && type in mappers) {
+    return mappers[type](value);
   }
   if (Array.isArray(type)) {
     var xs = [];
@@ -12,11 +9,14 @@ function loop (value, type, mappers) {
       xs[i] = loop(value[i], type[i] || last, mappers);
     return xs;
   }
-  var o = {};
-  for (var k in type)
-    if (k in value)
-      o[k] = loop(value[k], type[k], mappers);
-  return o;
+  if (typeof type === "object" && type !== null) {
+    var o = {};
+    for (var k in type)
+      if (k in value)
+        o[k] = loop(value[k], type[k], mappers);
+    return o;
+  }
+  throw new Error("Unrecognized type: "+type);
 };
 
 module.exports = loop;

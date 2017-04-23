@@ -1,19 +1,18 @@
-
-var Melf = require("melf");
+var Melf = require("melf/node");
 var Kalah = require("kalah");
-
 var melf = Melf({
-  boxdir: __dirname+"/boxdir",
-  alias: "spirou"
+  format: JSON,
+  alias: "spirou",
+  url: __dirname+"/socket",
+  splitter: "marsupilami"
 });
 var kalah = Kalah(melf);
-
-melf.sync.register("marsupilami", function (origin, data) {
-  var marsupilami = kalah.import(JSON.parse(data));
+melf.sync.register("marsupilami", function (origin, data, callback) {
+  var marsupilami = kalah.import(data);
   marsupilami.toys.push("car");
   marsupilami.toys.push("plane");
   marsupilami.play();
-  return "that was funky!";
+  callback(null, "that was funky!");
+  process.send("done");
 });
-
-melf.close();
+process.send("ready");
