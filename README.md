@@ -1,6 +1,7 @@
-# kalah
-Remote references based on Melf
+# melf <img src="kalah.png" align="right" alt="kalah-logo" title="Kalah, the Gnome Illusionist"/>
 
+(A)Synchronous remote references based on [melf](https://www.npmjs.com/package/melf).
+Usage [here](/demo), live demo [here]()
 Demonstration by running in two separate terminals:
 
 ```sh
@@ -11,19 +12,20 @@ rm usage/boxdir/* ; node usage/fantasio.js
 node usage/spriou.js
 ```
 
-## `kalah = require("kalah")(melf, sync)`
+## `kalah = require("kalah")(melf, options)`
 
 * `melf :: melf.Melf`
-* `sync :: boolean`
+* `options :: object | undefined`
+  * `sync :: boolean | undefined`
 * `kalah :: object`
   * `alias = ownerof(value)`
     * `value :: *`
     * `alias :: string`
-  * `value = import(json, type)`
-    * `json :: json`
-    * `type :: json`
+  * `value = import(data, type)`
+    * `data :: json`
+    * `type :: json | undefined`
     * `value :: *`
-  * `json = export(value, type)`
+  * `data = export(value, type)`
     * `value :: *`
-    * `type :: json`
-    * `json :: json`
+    * `type :: json | undefined`
+    * `data :: json`

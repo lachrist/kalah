@@ -1,66 +1,59 @@
 
-var Reference = require("./reference.js");
-var TypeMap = require("./type-map.js");
+const Reference = require("./reference.js");
+const TypeMap = require("./type-map.js");
 
-function isjsonprimitive (x) {
-  return x === null
-      || x === true
-      || x === false
-      || typeof x === "number"
-      || typeof x === "string";
+const isjsonprimitive = (x) => {
+  return x === null || x === true || x === false || typeof x === "number" || typeof x === "string";
 }
 
-function identity (x) { return x }
-
-module.exports = function (melf, sync) {
-  var kalah = {};
-  var reference = Reference(melf, kalah, sync);
-  var importers = {
+module.exports = (melf, options) => {
+  options = options || {};
+  options.sync = options.sync || false;
+  options.prefix = options.prefix || "";
+  const imp = (value, type) => TypeMap(value, type || "any", importers);
+  const exp = (value, type) => TypeMap(value, type || "any", exporters);
+  const reference = Reference(melf, imp, exp, options);
+  const importers = {
     reference: reference.import,
-    json: identity,
-    boolean: identity,
-    number: identity,
-    string: identity,
-    primitive: function (x) {
-      return (x && "u" in x) ? undefined : x;
-    },
-    any: function (x) {
+    json: (x) => x,
+    boolean: (x) => x,
+    number: (x) => x,
+    string: (x) => x,
+    primitive: (x) => (x && "u" in x) ? void 0 : x,
+    any: (x) => {
       if (isjsonprimitive(x))
         return x;
       if ("u" in x)
-        return undefined;
+        return void 0;
       return reference.import(x.r);
     }
   };
-  var exporters = {
+  const exporters = {
     reference: reference.export,
-    json: identity,
+    json: (x) => x,
     boolean: Boolean,
     number: Number,
     string: String,
-    primitive: function (x) {
+    primitive: (x) => {
       if (typeof x === "object" && x !== null)
         x = x.valueOf();
-      if (x === undefined)
+      if (x === void 0)
         return {u:1};
       if (isjsonprimitive(x))
         return x;
       return Object.prototype.toString.apply(x);
     },
-    any: function (x) {
+    any: (x) => {
       if (isjsonprimitive(x))
         return x;
       if (x === undefined)
-        return {u:0};
+        return {u:1};
       return {r:exporters.reference(x)};
     }
   };
-  kalah.ownerof = reference.ownerof,
-  kalah.import = function (value, type) {
-    return TypeMap(value, type || "any", importers);
+  return {
+    import: imp,
+    export: exp,
+    ownerof: reference.ownerof
   };
-  kalah.export = function (value, type) {
-    return TypeMap(value, type || "any", exporters);
-  };
-  return kalah;
 };

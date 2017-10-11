@@ -1,10 +1,19 @@
-{ "name" : "kalah"
-, "description" : "Remote references for JavaScript programs based on http://npmjs.com/melf"
-, "version" : "0.0.1"
-, "author" : {"name":"Laurent Christophe", "email":"lachrist@vub.ac.be"}
-, "repository": "lachrist/kalah"
-, "homepage": "http://github.com/lachrist/kalah"
-, "license" : "MIT"
-, "main": "main.js"
-, "keywords" : ["JavaScript", "Remote reference", "Communication", "Pull-based", "Synchronous", "Asynchronous"]
+{
+  "name": "kalah",
+  "description": "Remote references for JavaScript programs based on http://npmjs.com/melf",
+  "version": "0.0.1",
+  "author": {
+    "name": "Laurent Christophe",
+    "email": "lachrist@vub.ac.be"
+  },
+  "repository": "lachrist/kalah",
+  "homepage": "http://github.com/lachrist/kalah",
+  "license": "MIT",
+  "main": "main.js",
+  "keywords": [
+    "Remote reference",
+    "Melf",
+    "Synchronous",
+    "Asynchronous"
+  ]
 }
