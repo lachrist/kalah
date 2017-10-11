@@ -24,12 +24,12 @@ Usage [here](/demo), live demo [here](https://cdn.rawgit.com/lachrist/kalah/1d45
 
 ## Type
 
-* `boolean`
-* `number`
-* `string`
-* `primitive`
-* `reference`
-* `json`
-* `any`
+* `"boolean"`
+* `"number"`
+* `"string"`
+* `"primitive"`
+* `"reference"`
+* `"json"`
+* `"any"`
 * `{Type}`
 * `[Type]`
