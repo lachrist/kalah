@@ -6,19 +6,20 @@ Usage [here](/demo), live demo [here](https://cdn.rawgit.com/lachrist/kalah/1d45
 ## `kalah = require("kalah")(melf, options)`
 
 * `melf :: melf.Melf`
-* `options :: object | undefined`
-  * `sync :: boolean | undefined`
+* `options :: object`
+  * `sync :: boolean`
+  * `namespace :: string`
 * `kalah :: object`
   * `alias = ownerof(value)`
     * `value :: *`
     * `alias :: string`
   * `value = import(data, type)`
     * `data :: json`
-    * `type :: Type | undefined`
+    * `type :: Type`
     * `value :: *`
   * `data = export(value, type)`
     * `value :: *`
-    * `type :: Type | undefined`
+    * `type :: Type`
     * `data :: json`
 
 
