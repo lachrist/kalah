@@ -22,7 +22,6 @@ Usage [here](/demo), live demo [here](https://cdn.rawgit.com/lachrist/kalah/1d45
     * `type :: Type`
     * `data :: json`
 
-
 ## Type
 
 * `boolean`
