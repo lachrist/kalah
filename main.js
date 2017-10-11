@@ -1,9 +1,8 @@
 
-var Remote = require("./remote.js");
 var Reference = require("./reference.js");
 var TypeMap = require("./type-map.js");
 
-function isjson (x) {
+function isjsonprimitive (x) {
   return x === null
       || x === true
       || x === false
@@ -11,63 +10,57 @@ function isjson (x) {
       || typeof x === "string";
 }
 
-module.exports = function (melf) {
-  var kahla = {};
-  var remote = Remote(melf, kahla);
-  var reference = Reference(melf.alias, remote);
+function identity (x) { return x }
+
+module.exports = function (melf, sync) {
+  var kalah = {};
+  var reference = Reference(melf, kalah, sync);
   var importers = {
+    reference: reference.import,
+    json: identity,
+    boolean: identity,
+    number: identity,
+    string: identity,
     primitive: function (x) {
-      if (isjson(x))
-        return x;
-      if ("u" in x)
-        return undefined;
-      throw new Error("Cannot import a primitive from: "+JSON.stringify(x));
-    },
-    reference: function (x) {
-      return x === null ? null : reference.import(x);
+      return (x && "u" in x) ? undefined : x;
     },
     any: function (x) {
-      if (isjson(x))
+      if (isjsonprimitive(x))
         return x;
       if ("u" in x)
         return undefined;
-      return reference.import(x);
-    },
+      return reference.import(x.r);
+    }
+  };
+  var exporters = {
+    reference: reference.export,
+    json: identity,
     boolean: Boolean,
     number: Number,
     string: String,
-    target: function (idx) { return reference.local(idx) }
-  };
-  var exporters = {
     primitive: function (x) {
       if (typeof x === "object" && x !== null)
         x = x.valueOf();
-      if (isjson(x))
-        return x;
       if (x === undefined)
         return {u:1};
-      return "[object Object]";
-    },
-    reference: function (x) {
-      return x === null ? null : reference.export(Object(x));
+      if (isjsonprimitive(x))
+        return x;
+      return Object.prototype.toString.apply(x);
     },
     any: function (x) {
-      if (isjson(x))
+      if (isjsonprimitive(x))
         return x;
       if (x === undefined)
-        return {u:1};
-      return exporters.reference(x);
-    },
-    boolean: Boolean,
-    number: Number,
-    string: String,
-    target: function (tgt) { return tgt.counter }
+        return {u:0};
+      return {r:exporters.reference(x)};
+    }
   };
-  kahla.import = function (value, type) {
+  kalah.ownerof = reference.ownerof,
+  kalah.import = function (value, type) {
     return TypeMap(value, type || "any", importers);
   };
-  kahla.export = function (value, type) {
+  kalah.export = function (value, type) {
     return TypeMap(value, type || "any", exporters);
   };
-  return kahla;
+  return kalah;
 };
