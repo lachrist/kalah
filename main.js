@@ -2,10 +2,6 @@
 const Reference = require("./reference.js");
 const TypeMap = require("./type-map.js");
 
-const isjsonprimitive = (x) => {
-  return x === null || x === true || x === false || typeof x === "number" || typeof x === "string";
-}
-
 module.exports = (melf, options) => {
   options = options || {};
   options.sync = options.sync || false;
@@ -14,41 +10,102 @@ module.exports = (melf, options) => {
   const exp = (value, type) => TypeMap(value, type || "any", exporters);
   const reference = Reference(melf, imp, exp, options);
   const importers = {
-    reference: reference.import,
     json: (x) => x,
-    boolean: (x) => x,
-    number: (x) => x,
-    string: (x) => x,
-    primitive: (x) => (x && "u" in x) ? void 0 : x,
-    any: (x) => {
-      if (isjsonprimitive(x))
+    reference: reference.import,
+    boolean: Boolean,
+    number: (x) => {
+      if (Array.isArray(x) && x.length === 1) {
+        const inner = x[0];
+        if (inner === "undefined")
+          return void 0;
+        if (inner === "NaN")
+          return 0/0;
+        if (inner === "-Infinity")
+          return -1/0;
+        if (inner === "Infinity")
+          return 1/0;
+      }
+      return Number(x);
+    },
+    string: String,
+    primitive: (x) => {
+      if (typeof x === "number" || typeof x === "string" || x === null)
         return x;
-      if ("u" in x)
-        return void 0;
-      return reference.import(x.r);
+      if (Array.isArray(x) && x.length === 1) {
+        const inner = x[0];
+        if (inner === "undefined")
+          return void 0;
+        if (inner === "NaN")
+          return 0/0;
+        if (inner === "-Infinity")
+          return -1/0;
+        if (inner === "Infinity")
+          return 1/0;
+      }
+      throw new Error("Cannot import as primitive: "+x);
+    },
+    any: (x) => {
+      if (typeof x === "number" || typeof x === "string" || x === null)
+        return x;
+      if (Array.isArray(x) && x.length === 1) {
+        const inner = x[0];
+        if (inner === "undefined")
+          return void 0;
+        if (inner === "NaN")
+          return 0/0;
+        if (inner === "-Infinity")
+          return -1/0;
+        if (inner === "Infinity")
+          return 1/0;
+        return reference.import(inner);
+      }
+      throw new Error("Cannot import: "+x);
     }
   };
   const exporters = {
-    reference: reference.export,
     json: (x) => x,
+    reference: reference.export,
     boolean: Boolean,
-    number: Number,
+    number: (x) => {
+      x = Number(x);
+      if (x !== x)
+        return ["NaN"];
+      if (x === -1/0)
+        return ["-Infinity"];
+      if (x === 1/0)
+        return ["Infinity"];
+      return x;
+    },
     string: String,
     primitive: (x) => {
-      if (typeof x === "object" && x !== null)
-        x = x.valueOf();
+      if (typeof x === "symbol")
+        throw new Error("Cannot exports symbols: "+x);
       if (x === void 0)
-        return {u:1};
-      if (isjsonprimitive(x))
+        return ["undefined"];
+      if (x !== x)
+        return ["NaN"];
+      if (x === -1/0)
+        return ["-Infinity"];
+      if (x === 1/0)
+        return ["Infinity"];
+      if (x === null || typeof x === "number" || typeof x === "string")
         return x;
-      return Object.prototype.toString.apply(x);
+      throw new Error("Cannot exports as primitive: "+x);
     },
     any: (x) => {
-      if (isjsonprimitive(x))
+      if (typeof x === "symbol")
+        throw new Error("Cannot exports symbols: "+x);
+      if (x === void 0)
+        return ["undefined"];
+      if (x !== x)
+        return ["NaN"];
+      if (x === -1/0)
+        return ["-Infinity"];
+      if (x === 1/0)
+        return ["Infinity"];
+      if (x === null || typeof x === "number" || typeof x === "string")
         return x;
-      if (x === undefined)
-        return {u:1};
-      return {r:exporters.reference(x)};
+      return [exporters.reference(x)];
     }
   };
   return {
