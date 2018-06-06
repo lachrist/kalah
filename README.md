@@ -1,5 +1,7 @@
 # kalah <img src="kalah.png" align="right" alt="kalah-logo" title="Kalah, the Gnome Illusionist"/>
 
+**This module has been renamed MelfSharing and is available at https://github.com/lachrist/melf-sharing**
+
 (A)Synchronous remote references based on [melf](https://www.npmjs.com/package/melf).
 Usage [here](/demo), live demo [here](https://cdn.rawgit.com/lachrist/kalah/1d4515d9/demo/index.html).
 

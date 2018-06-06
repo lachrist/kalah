@@ -6,10 +6,10 @@ module.exports = (melf, imp, exp, options) => {
   const traps = {};
   const refs = {};
   Reflect.ownKeys(Reflect).forEach((key) => {
-    const name = "kalah-"+options.namespace+key;
+    const name = "kalah-"+key;
     const itype = ReflectTypes[key][0];
     const otype = ReflectTypes[key][1];
-    melf.rprocedures[name] = (origin, data, callback) => { 
+    melf.rprocedures[name] = (origin, data, callback) => {
       try {
         const target = refs[melf.alias+"/"+data.shift()];
         const arguments = imp(data, itype);
@@ -39,6 +39,7 @@ module.exports = (melf, imp, exp, options) => {
       }
     }
   });
+  // TODO suport symbol's name
   return {
     ownerof: (ref) => {
       for (let key in refs)
@@ -50,6 +51,8 @@ module.exports = (melf, imp, exp, options) => {
       if (key in refs)
         return refs[key];
       const parts = key.split("/");
+      // if (parts[1][0] === "s")
+      //   return refs[key] = Symbol(key);
       const target = parts[1][0] === "f" ? (() => {}) : (parts[1][0] === "a" ? [] : {});
       target.alias = parts[0];
       target.token = parts[1];
@@ -59,8 +62,7 @@ module.exports = (melf, imp, exp, options) => {
       for (let key in refs)
         if (refs[key] === ref)
           return key;
-      const type = typeof ref === "function" ? "f" : (Array.isArray(ref) ? "a" : "o");
-      const key = melf.alias+"/"+type+(++counter).toString(36);
+      const key = melf.alias+"/"+(Array.isArray(ref) ? "a" : (typeof ref)[0])+(++counter).toString(36);
       refs[key] = ref;
       return key;
     }

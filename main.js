@@ -5,7 +5,6 @@ const TypeMap = require("./type-map.js");
 module.exports = (melf, options) => {
   options = options || {};
   options.sync = options.sync || false;
-  options.prefix = options.prefix || "";
   const imp = (value, type) => TypeMap(value, type || "any", importers);
   const exp = (value, type) => TypeMap(value, type || "any", exporters);
   const reference = Reference(melf, imp, exp, options);
@@ -29,7 +28,7 @@ module.exports = (melf, options) => {
     },
     string: String,
     primitive: (x) => {
-      if (typeof x === "number" || typeof x === "string" || x === null)
+      if (x === null || x === true || x === false || typeof x === "number" || typeof x === "string")
         return x;
       if (Array.isArray(x) && x.length === 1) {
         const inner = x[0];
@@ -45,7 +44,7 @@ module.exports = (melf, options) => {
       throw new Error("Cannot import as primitive: "+x);
     },
     any: (x) => {
-      if (typeof x === "number" || typeof x === "string" || x === null)
+      if (x === null || x === true || x === false || typeof x === "number" || typeof x === "string")
         return x;
       if (Array.isArray(x) && x.length === 1) {
         const inner = x[0];
@@ -78,8 +77,6 @@ module.exports = (melf, options) => {
     },
     string: String,
     primitive: (x) => {
-      if (typeof x === "symbol")
-        throw new Error("Cannot exports symbols: "+x);
       if (x === void 0)
         return ["undefined"];
       if (x !== x)
@@ -88,13 +85,13 @@ module.exports = (melf, options) => {
         return ["-Infinity"];
       if (x === 1/0)
         return ["Infinity"];
-      if (x === null || typeof x === "number" || typeof x === "string")
+      if (x === null || x === true || x === false || typeof x === "number" || typeof x === "string")
         return x;
+      if (typeof x === "symbol")
+        return String(x);
       throw new Error("Cannot exports as primitive: "+x);
     },
     any: (x) => {
-      if (typeof x === "symbol")
-        throw new Error("Cannot exports symbols: "+x);
       if (x === void 0)
         return ["undefined"];
       if (x !== x)
@@ -103,14 +100,16 @@ module.exports = (melf, options) => {
         return ["-Infinity"];
       if (x === 1/0)
         return ["Infinity"];
-      if (x === null || typeof x === "number" || typeof x === "string")
+      if (x === null || x === true || x === false || typeof x === "number" || typeof x === "string")
         return x;
-      return [exporters.reference(x)];
+      if (typeof x === "symbol")
+        return String(x);
+      return [reference.export(x)];
     }
   };
   return {
-    import: imp,
-    export: exp,
+    parse: imp,
+    jsonify: exp,
     ownerof: reference.ownerof
   };
 };
